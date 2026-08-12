@@ -1,98 +1,105 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+/**
+ * TrackerLite — Main Map Tracking Screen
+ * Composes all components: StatusBar, MapDisplay, TripInfoBar, ControlPanel
+ * Initializes hooks for location tracking, network monitoring, and offline sync
+ */
+
+import React from 'react';
+import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors } from '@/constants/theme';
+import { StatusBar } from '@/components/StatusBar';
+import { MapDisplay } from '@/components/MapDisplay';
+import { TripInfoBar } from '@/components/TripInfoBar';
+import { ControlPanel } from '@/components/ControlPanel';
+import { useLocationTracking } from '@/hooks/useLocationTracking';
+import { useNetworkMonitor } from '@/hooks/useNetworkMonitor';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
+import { useTripStore } from '@/store/useTripStore';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+export default function MapScreen() {
+  // Initialize hooks
+  const {
+    isTracking,
+    mode,
+    startTrip,
+    stopTrip,
+    setMode,
+  } = useLocationTracking();
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+  const {
+    effectiveOnline,
+    isManualOffline,
+    toggleManualOffline,
+  } = useNetworkMonitor();
+
+  const {
+    isSyncing,
+    pendingCount,
+    triggerSync,
+  } = useOfflineSync();
+
+  // Subscribe to trip store for stats
+  const coordinates = useTripStore((s) => s.coordinates);
+  const elapsedTime = useTripStore((s) => s.elapsedTime);
+  const currentSpeed = useTripStore((s) => s.currentSpeed);
+  const totalDistance = useTripStore((s) => s.totalDistance);
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+    <View style={styles.container}>
+      {/* Full-screen Map */}
+      <View style={styles.mapContainer}>
+        <MapDisplay
+          coordinates={coordinates}
+          isTracking={isTracking}
+        />
+      </View>
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+      {/* Overlay: Status Bar */}
+      <StatusBar
+        effectiveOnline={effectiveOnline}
+        pendingCount={pendingCount}
+        isSyncing={isSyncing}
+      />
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+      {/* Bottom Panel */}
+      <View style={styles.bottomPanel}>
+        {/* Trip Info */}
+        <TripInfoBar
+          elapsedTime={elapsedTime}
+          currentSpeed={currentSpeed}
+          totalDistance={totalDistance}
+          mode={mode}
+          isTracking={isTracking}
+        />
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+        {/* Controls */}
+        <ControlPanel
+          isTracking={isTracking}
+          mode={mode}
+          isManualOffline={isManualOffline}
+          isSyncing={isSyncing}
+          pendingCount={pendingCount}
+          onStartTrip={startTrip}
+          onStopTrip={stopTrip}
+          onToggleMode={setMode}
+          onToggleOffline={toggleManualOffline}
+          onSync={triggerSync}
+        />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    backgroundColor: Colors.background,
   },
-  safeArea: {
+  mapContainer: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  bottomPanel: {
+    backgroundColor: Colors.background,
   },
 });
