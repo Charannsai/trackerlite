@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     ...Shadows.glow(Colors.offline),
   },
   buttonGlow: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: BorderRadius.lg,
   },
   mainButtonIcon: {
