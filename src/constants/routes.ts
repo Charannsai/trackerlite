@@ -101,7 +101,7 @@ export const SIMULATION_INTERVAL_MS = 1000;
 
 /** API configuration */
 export const API_CONFIG = {
-  baseUrl: 'http://10.0.2.2:3001', // Android emulator localhost alias
+  baseUrl: 'http://192.168.29.148:3001', // Local LAN server IP (works on physical devices & emulators)
   syncEndpoint: '/api/sync',
   healthEndpoint: '/api/health',
   batchSize: 10,

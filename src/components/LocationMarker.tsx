@@ -1,6 +1,7 @@
 /**
  * TrackerLite — LocationMarker Component
- * Custom animated marker with pulsing circle effect and heading indicator
+ * Custom animated marker with pulse effect and heading arrow
+ * Engineered for Android/iOS native stability
  */
 
 import React, { useEffect, useRef } from 'react';
@@ -21,34 +22,34 @@ function LocationMarkerComponent({
   accuracy,
 }: LocationMarkerProps) {
   const pulseScale = useRef(new Animated.Value(1)).current;
-  const pulseOpacity = useRef(new Animated.Value(0.6)).current;
+  const pulseOpacity = useRef(new Animated.Value(0.7)).current;
 
-  // Ripple pulse animation
+  // Pulse animation (useNativeDriver: false inside Marker prevents Android native view reparenting bugs)
   useEffect(() => {
     const animation = Animated.loop(
       Animated.parallel([
         Animated.sequence([
           Animated.timing(pulseScale, {
-            toValue: 2.5,
-            duration: 1500,
-            useNativeDriver: true,
+            toValue: 2.2,
+            duration: 1600,
+            useNativeDriver: false,
           }),
           Animated.timing(pulseScale, {
             toValue: 1,
             duration: 0,
-            useNativeDriver: true,
+            useNativeDriver: false,
           }),
         ]),
         Animated.sequence([
           Animated.timing(pulseOpacity, {
             toValue: 0,
-            duration: 1500,
-            useNativeDriver: true,
+            duration: 1600,
+            useNativeDriver: false,
           }),
           Animated.timing(pulseOpacity, {
-            toValue: 0.6,
+            toValue: 0.7,
             duration: 0,
-            useNativeDriver: true,
+            useNativeDriver: false,
           }),
         ]),
       ])
@@ -59,10 +60,10 @@ function LocationMarkerComponent({
 
   return (
     <Marker
+      key="user-current-marker"
       coordinate={coordinate}
       anchor={{ x: 0.5, y: 0.5 }}
       flat={true}
-      tracksViewChanges={false}
     >
       <View style={styles.markerContainer}>
         {/* Pulse ring */}
@@ -75,20 +76,6 @@ function LocationMarkerComponent({
             },
           ]}
         />
-
-        {/* Accuracy circle */}
-        {accuracy !== null && accuracy > 0 && (
-          <View
-            style={[
-              styles.accuracyCircle,
-              {
-                width: Math.max(30, Math.min(accuracy * 2, 80)),
-                height: Math.max(30, Math.min(accuracy * 2, 80)),
-                borderRadius: Math.max(15, Math.min(accuracy, 40)),
-              },
-            ]}
-          />
-        )}
 
         {/* Heading arrow */}
         {heading !== null && heading !== undefined && (
@@ -104,7 +91,7 @@ function LocationMarkerComponent({
           </View>
         )}
 
-        {/* Core dot */}
+        {/* Core marker dot */}
         <View style={styles.outerDot}>
           <View style={styles.innerDot} />
         </View>
@@ -115,25 +102,19 @@ function LocationMarkerComponent({
 
 const styles = StyleSheet.create({
   markerContainer: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
   },
   pulseRing: {
     position: 'absolute',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     backgroundColor: Colors.primaryDim,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.primary,
-  },
-  accuracyCircle: {
-    position: 'absolute',
-    backgroundColor: 'rgba(0, 229, 255, 0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(0, 229, 255, 0.15)',
   },
   headingArrow: {
     position: 'absolute',
@@ -145,30 +126,30 @@ const styles = StyleSheet.create({
   arrowShape: {
     width: 0,
     height: 0,
-    borderLeftWidth: 5,
-    borderRightWidth: 5,
-    borderBottomWidth: 10,
+    borderLeftWidth: 4,
+    borderRightWidth: 4,
+    borderBottomWidth: 8,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
     borderBottomColor: Colors.primary,
   },
   outerDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowRadius: 6,
+    elevation: 6,
   },
   innerDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: '#fff',
   },
 });
