@@ -4,7 +4,7 @@
  */
 
 import * as Location from 'expo-location';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from '@/utils/uuid';
 import type { Coordinate, TripPoint, TrackingMode } from '@/types';
 import { HYDERABAD_ROUTE, SIMULATION_INTERVAL_MS } from '@/constants/routes';
 import {

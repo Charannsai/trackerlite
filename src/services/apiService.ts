@@ -5,7 +5,7 @@
 
 import type { SyncBatch, SyncPoint, SyncResponse, TripPoint } from '@/types';
 import { API_CONFIG } from '@/constants/routes';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from '@/utils/uuid';
 import { toISO } from '@/utils/formatters';
 
 /**

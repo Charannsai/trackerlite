@@ -5,7 +5,7 @@
  */
 
 import * as SQLite from 'expo-sqlite';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from '@/utils/uuid';
 import type { QueuedPoint, TripPoint } from '@/types';
 import { toISO } from '@/utils/formatters';
 
